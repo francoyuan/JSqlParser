@@ -18,6 +18,7 @@ import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.schema.CreateSchema;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateDeputyClass;
 import net.sf.jsqlparser.statement.create.sequence.CreateSequence;
 import net.sf.jsqlparser.statement.create.synonym.CreateSynonym;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -68,6 +69,8 @@ public interface StatementVisitor {
     void visit(CreateTable createTable);
 
     void visit(CreateView createView);
+
+    void visit(CreateDeputyClass createDeputyClass);
 
     void visit(AlterView alterView);
 

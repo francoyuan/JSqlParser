@@ -43,3 +43,4 @@ select a.probability prob, a.cluster_id cl_id,
 order by prob desc, cl_id asc, conf desc, attr asc, val asc
 
 --@FAILURE: Encountered unexpected token: "(" "(" recorded first on Aug 3, 2021, 7:20:08 AM
+--@FAILURE: Encountered unexpected token: "from" "FROM" recorded first on 2022年12月9日 下午5:50:45

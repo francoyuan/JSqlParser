@@ -54,6 +54,7 @@ import net.sf.jsqlparser.statement.create.synonym.*;
 import net.sf.jsqlparser.statement.create.sequence.*;
 import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.create.view.*;
+import net.sf.jsqlparser.statement.create.deputyclass.*;
 import net.sf.jsqlparser.statement.delete.*;
 import net.sf.jsqlparser.statement.drop.*;
 import net.sf.jsqlparser.statement.insert.*;
@@ -362,6 +363,7 @@ TOKEN: /* SQL Keywords. prefixed with K_ to avoid name clashes */
 |   <K_SAVEPOINT: "SAVEPOINT">
 |   <K_SCHEMA: "SCHEMA">
 |   <K_SELECT: ("SELECT" | "SEL")>
+|   <K_DEPUTYCLASS: ("SELECTDEPUTY"|"UNIONDEPUTY"|"JOINDEPUTY")>
 |   <K_SEMI : "SEMI">
 |   <K_SEQUENCE: "SEQUENCE">
 |   <K_SEPARATOR:"SEPARATOR">
@@ -382,7 +384,7 @@ TOKEN: /* SQL Keywords. prefixed with K_ to avoid name clashes */
 |   <K_SWITCH: "SWITCH">
 |   <K_SYNONYM:"SYNONYM">
 |   <K_SYSTEM:"SYSTEM">
-|   <K_TABLE:"TABLE">
+|   <K_TABLE:"TABLE"|"CLASS">
 |   <K_TABLES:"TABLES">
 |   <K_TABLESPACE : "TABLESPACE">
 |   <K_THEN:"THEN">
@@ -449,7 +451,8 @@ TOKEN : /* Stuff */
 
 TOKEN : /* Operators */
 {
-    <OP_GREATERTHANEQUALS: ">" (<WHITESPACE>)* "=">
+  	 <OP_ARROW:"-"(<WHITESPACE>)*">" >
+|    <OP_GREATERTHANEQUALS: ">" (<WHITESPACE>)* "=">
 |    <OP_MINORTHANEQUALS: "<" (<WHITESPACE>)* "=">
 |    <OP_NOTEQUALSSTANDARD: "<" (<WHITESPACE>)* ">">
 |    <OP_NOTEQUALSBANG: "!" (<WHITESPACE>)* "=">
@@ -619,6 +622,9 @@ Statement SingleStatement() :
             LOOKAHEAD(CreateView())
             stm = CreateView()
             |
+            LOOKAHEAD(CreateDeputyClass())
+            stm=CreateDeputyClass()
+            | 
             LOOKAHEAD(AlterView())
             stm = AlterView()
             |
@@ -1950,6 +1956,7 @@ SelectBody SelectBody():
 PlainSelect PlainSelect() #PlainSelect:
 {
     PlainSelect plainSelect = new PlainSelect();
+	List<SelectItem> chain=null;
     List<SelectItem> selectItems = null;
     FromItem fromItem = null;
     List<Join> joins = null;
@@ -2013,7 +2020,12 @@ PlainSelect PlainSelect() #PlainSelect:
 
     [ LOOKAHEAD(2) top = Top() { plainSelect.setTop(top);    } ]
 
-    selectItems=SelectItemsList()
+	[ LOOKAHEAD(2) selectItems=SelectItemsList()
+	| chain=chain()
+	{plainSelect.setDeputyChain(chain);
+	 plainSelect.setDeputySelect(true);
+	 }]
+    
 
     [intoTables = IntoClause() { plainSelect.setIntoTables(intoTables); } ]
     [ LOOKAHEAD(2) <K_FROM>
@@ -2219,6 +2231,18 @@ List<SelectItem> SelectItemsList():
     selectItem=SelectItem() { selectItemsList.add(selectItem); } ( LOOKAHEAD(2) "," selectItem=SelectItem() { selectItemsList.add(selectItem); } )*
 
     { return selectItemsList; }
+}
+
+List<SelectItem> chain():
+{
+    List<SelectItem> chain = new ArrayList<SelectItem>();
+    SelectItem selectItem = null;
+}
+{
+    selectItem=SelectItem() { chain.add(selectItem); }
+    ( LOOKAHEAD(2) <OP_ARROW> selectItem=SelectItem() { chain.add(selectItem); } )*
+    { return chain;}
+
 }
 
 SelectExpressionItem SelectExpressionItem():
@@ -5398,6 +5422,26 @@ CreateView CreateView():
     select=SelectWithWithItems( ) { createView.setSelect(select); }
     [ <K_WITH> <K_READ> <K_ONLY> { createView.setWithReadOnly(true); } ]
     { return createView; }
+}
+
+CreateDeputyClass CreateDeputyClass():
+{
+    CreateDeputyClass createDeputyClass = new CreateDeputyClass();
+    Table deputy = null;
+    Select select = null;
+    List<String> columnNames = null;
+    Token tk;
+}
+{
+    <K_CREATE>
+    
+    [ <K_OR> <K_REPLACE> { createDeputyClass.setOrReplace(true);} ]
+    tk=<K_DEPUTYCLASS> deputy=Table() {
+      createDeputyClass.setType(tk.image);
+      createDeputyClass.setDeputyClass(deputy); }
+    <K_AS>
+    select=SelectWithWithItems( ) { createDeputyClass.setSelect(select); }
+    { return createDeputyClass; }
 }
 
 ReferentialAction.Action Action():

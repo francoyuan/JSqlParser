@@ -25,7 +25,8 @@ import net.sf.jsqlparser.schema.Table;
 
 @SuppressWarnings({"PMD.CyclomaticComplexity"})
 public class PlainSelect extends ASTNodeAccessImpl implements SelectBody {
-
+	private boolean deputySelect;
+	private List<SelectItem> deputyChain;
     private Distinct distinct = null;
     private List<SelectItem> selectItems;
     private List<Table> intoTables;
@@ -60,6 +61,22 @@ public class PlainSelect extends ASTNodeAccessImpl implements SelectBody {
     private WithIsolation withIsolation;
     private List<WindowDefinition> windowDefinitions;
 
+    public boolean isDeputySelect() {
+    	return deputySelect;
+    }
+    
+    public void setDeputySelect(boolean deputySelect){
+    	this.deputySelect=deputySelect;
+    }
+    
+    public List<SelectItem> deputyChain(){
+    	return deputyChain;
+    }
+    
+    public void setDeputyChain(List<SelectItem> deputyChain) {
+    	this.deputyChain=deputyChain;
+    }
+    
     public boolean isUseBrackets() {
         return useBrackets;
     }
@@ -394,6 +411,12 @@ public class PlainSelect extends ASTNodeAccessImpl implements SelectBody {
         }
         if (mySqlSqlCalcFoundRows) {
             sql.append("SQL_CALC_FOUND_ROWS").append(" ");
+        }
+        if (isDeputySelect()) {
+        	for(int i=0;i<deputyChain.size()-1;i++) {
+        		sql.append(deputyChain.get(i)+"->");
+        	}
+        	sql.append(deputyChain.get(deputyChain.size()-1));
         }
         sql.append(getStringList(selectItems));
 

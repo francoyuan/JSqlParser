@@ -4,14 +4,14 @@
           "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-  <module name="SuppressWarningsFilter" />
+  <!--<module name="SuppressWarningsFilter" />
   <module name="FileTabCharacter" />
-  <!-- git checkout may change linefeeds on the fly
+  &lt;!&ndash; git checkout may change linefeeds on the fly
   <module name="RegexpMultiline">
       <property name="format" value="(?s:(\r\n|\r).*)" />
       <property name="message" value="CRLF and CR line endings are prohibited, but this file uses them." />
   </module>
-  -->
+  &ndash;&gt;
   <module name="TreeWalker">
     <module name="AvoidNestedBlocks" />
     <module name="ConstantName" />
@@ -32,5 +32,5 @@
     <module name="RightCurly" />
 
     <module name="SuppressWarningsHolder" />
-  </module>
+  </module>-->
 </module>

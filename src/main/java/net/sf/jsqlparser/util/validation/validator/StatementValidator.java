@@ -45,6 +45,7 @@ import net.sf.jsqlparser.statement.create.synonym.CreateSynonym;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.view.AlterView;
 import net.sf.jsqlparser.statement.create.view.CreateView;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateDeputyClass;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.execute.Execute;
@@ -79,6 +80,11 @@ public class StatementValidator extends AbstractValidator<Statement> implements 
     @Override
     public void visit(CreateView createView) {
         getValidator(CreateViewValidator.class).validate(createView);
+    }
+
+    @Override
+    public void visit(CreateDeputyClass createDeputyClass) {
+        getValidator(CreateDeputyClassValidator.class).validate(createDeputyClass);
     }
 
     @Override

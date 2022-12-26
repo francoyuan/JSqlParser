@@ -40,6 +40,7 @@ import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.schema.CreateSchema;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateDeputyClass;
 import net.sf.jsqlparser.statement.create.sequence.CreateSequence;
 import net.sf.jsqlparser.statement.create.synonym.CreateSynonym;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -94,6 +95,12 @@ public class StatementDeParser extends AbstractDeParser<Statement> implements St
         CreateViewDeParser createViewDeParser = new CreateViewDeParser(buffer);
         createViewDeParser.deParse(createView);
     }
+    @Override
+    public void visit(CreateDeputyClass createDeputyClass) {
+        CreateDeputyClassDeParser createDeputyClassDeParser = new CreateDeputyClassDeParser(buffer);
+        createDeputyClassDeParser.deParse(createDeputyClass);
+    }
+
 
     @Override
     public void visit(AlterView alterView) {

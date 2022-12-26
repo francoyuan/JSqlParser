@@ -476,6 +476,10 @@ public enum Feature {
     /**
      * "CREATE FORCE VIEW"
      */
+    createSelectDeputy,
+    /**
+     * "CREATE SelectDeputy"
+     */
     createViewForce,
     /**
      * "CREATE TEMPORARAY VIEW"
@@ -485,6 +489,10 @@ public enum Feature {
      * "CREATE OR REPLACE VIEW"
      */
     createOrReplaceView,
+    /**
+     * "CREATE OR REPLACE SelectDeputy"
+     */
+    createOrReplaceSelectDeputy,
     /**
      * SQL "CREATE MATERIALIZED VIEW" statement is allowed
      */
