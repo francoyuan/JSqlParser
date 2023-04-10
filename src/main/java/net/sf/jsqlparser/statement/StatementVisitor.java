@@ -16,6 +16,7 @@ import net.sf.jsqlparser.statement.alter.RenameTableStatement;
 import net.sf.jsqlparser.statement.alter.sequence.AlterSequence;
 import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateTJoinDeputyClass;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.schema.CreateSchema;
 import net.sf.jsqlparser.statement.create.deputyclass.CreateDeputyClass;
@@ -71,6 +72,11 @@ public interface StatementVisitor {
     void visit(CreateView createView);
 
     void visit(CreateDeputyClass createDeputyClass);
+
+
+    //TODO TMDB
+    //在statementVisitor中加入对createTjoinDeputyClass的访问
+
 
     void visit(AlterView alterView);
 

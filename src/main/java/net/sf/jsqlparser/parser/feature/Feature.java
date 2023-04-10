@@ -480,6 +480,12 @@ public enum Feature {
     /**
      * "CREATE SelectDeputy"
      */
+
+
+    //TODO TMDB
+    //在feature这个枚举类中加入CreateTJoinDeputyClass
+
+
     createViewForce,
     /**
      * "CREATE TEMPORARAY VIEW"

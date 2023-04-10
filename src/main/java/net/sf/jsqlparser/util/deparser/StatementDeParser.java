@@ -38,6 +38,7 @@ import net.sf.jsqlparser.statement.alter.RenameTableStatement;
 import net.sf.jsqlparser.statement.alter.sequence.AlterSequence;
 import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateTJoinDeputyClass;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.schema.CreateSchema;
 import net.sf.jsqlparser.statement.create.deputyclass.CreateDeputyClass;
@@ -100,6 +101,9 @@ public class StatementDeParser extends AbstractDeParser<Statement> implements St
         CreateDeputyClassDeParser createDeputyClassDeParser = new CreateDeputyClassDeParser(buffer);
         createDeputyClassDeParser.deParse(createDeputyClass);
     }
+
+    //TODO TMDB
+    //在statementDeParser中加入对CreateTJoinDeputyClassDeparesr的访问
 
 
     @Override

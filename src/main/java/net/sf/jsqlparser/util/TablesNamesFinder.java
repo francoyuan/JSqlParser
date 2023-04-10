@@ -30,6 +30,7 @@ import net.sf.jsqlparser.statement.alter.sequence.AlterSequence;
 import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
 import net.sf.jsqlparser.statement.create.deputyclass.CreateDeputyClass;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateTJoinDeputyClass;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.schema.CreateSchema;
 import net.sf.jsqlparser.statement.create.sequence.CreateSequence;
@@ -739,6 +740,10 @@ public class TablesNamesFinder implements SelectVisitor, FromItemVisitor, Expres
     public void visit(CreateDeputyClass createDeputyClass) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
+
+    //TODO TMDB
+    //加入针对CreateTJoinDeputyClass的访问
+
 
     @Override
     public void visit(Alter alter) {

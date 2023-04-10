@@ -36,6 +36,7 @@ import net.sf.jsqlparser.statement.alter.RenameTableStatement;
 import net.sf.jsqlparser.statement.alter.sequence.AlterSequence;
 import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateTJoinDeputyClass;
 import net.sf.jsqlparser.statement.create.function.CreateFunction;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.procedure.CreateProcedure;
@@ -86,6 +87,10 @@ public class StatementValidator extends AbstractValidator<Statement> implements 
     public void visit(CreateDeputyClass createDeputyClass) {
         getValidator(CreateDeputyClassValidator.class).validate(createDeputyClass);
     }
+
+    //TMDB TODO
+    //在StatementValidator中加入针对CreateTJoinDeputyClassValidator类的访问
+
 
     @Override
     public void visit(AlterView alterView) {

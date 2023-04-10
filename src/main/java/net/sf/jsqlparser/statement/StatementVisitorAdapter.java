@@ -16,6 +16,7 @@ import net.sf.jsqlparser.statement.alter.RenameTableStatement;
 import net.sf.jsqlparser.statement.alter.sequence.AlterSequence;
 import net.sf.jsqlparser.statement.analyze.Analyze;
 import net.sf.jsqlparser.statement.comment.Comment;
+import net.sf.jsqlparser.statement.create.deputyclass.CreateTJoinDeputyClass;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.schema.CreateSchema;
 import net.sf.jsqlparser.statement.create.sequence.CreateSequence;
@@ -109,6 +110,9 @@ public class StatementVisitorAdapter implements StatementVisitor {
     public void visit(CreateDeputyClass createDeputyClass) {
 
     }
+
+    //TODO TMDB
+    //override visit方法
 
     @Override
     public void visit(Alter alter) {
