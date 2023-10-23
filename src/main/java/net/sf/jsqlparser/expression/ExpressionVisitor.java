@@ -21,6 +21,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 public interface ExpressionVisitor {
 
+    void visit(ArrowExpression aThis);
+
     void visit(BitwiseRightShift aThis);
 
     void visit(BitwiseLeftShift aThis);

@@ -365,7 +365,8 @@ TOKEN: /* SQL Keywords. prefixed with K_ to avoid name clashes */
 |   <K_SELECT: ("SELECT" | "SEL")>
 |   <K_DEPUTYCLASS: ("SELECTDEPUTY"|"UNIONDEPUTY"|"JOINDEPUTY"|"GroupDeputy")>
 //TODO TMDB
-//加入TJoinDeputyClass token
+//加入TJoinDeputyClass token'
+|   <K_TJoinDEPUTYCLASS: ("TJOINDEPUTY")>
 |   <K_SEMI : "SEMI">
 |   <K_SEQUENCE: "SEQUENCE">
 |   <K_SEPARATOR:"SEPARATOR">
@@ -627,9 +628,10 @@ Statement SingleStatement() :
             LOOKAHEAD(CreateDeputyClass())
             stm=CreateDeputyClass()
             |
-            //TODO TMDB
-            //把CreateTJoinDeputyClass加入statement解析里
-
+            //TMDB
+            LOOKAHEAD(CreateTJoinDeputyClass())
+            stm=CreateTJoinDeputyClass()
+            |
             LOOKAHEAD(AlterView())
             stm = AlterView()
             |
@@ -1961,8 +1963,6 @@ SelectBody SelectBody():
 PlainSelect PlainSelect() #PlainSelect:
 {
     PlainSelect plainSelect = new PlainSelect();
-    SelectItem firstItem=null;
-	List<SelectItem> chain=null;
     List<SelectItem> selectItems = null;
     FromItem fromItem = null;
     List<Join> joins = null;
@@ -2026,22 +2026,7 @@ PlainSelect PlainSelect() #PlainSelect:
 
     [ LOOKAHEAD(2) top = Top() { plainSelect.setTop(top);    } ]
 
-
-
-   	 [LOOKAHEAD(2)firstItem=SelectItem()]
-
-     selectItems=SelectItemsList()
-
-     chain=chain() {
-     if(!chain.isEmpty()) {
-       chain.add(0,firstItem);
-              plainSelect.setDeputyChain(chain);
-         	 plainSelect.setDeputySelect(true);
-      	}
-     }
-
-
-
+    selectItems=SelectItemsList()
 
     [intoTables = IntoClause() { plainSelect.setIntoTables(intoTables); } ]
     [ LOOKAHEAD(2) <K_FROM>
@@ -2077,7 +2062,6 @@ PlainSelect PlainSelect() #PlainSelect:
     [LOOKAHEAD(3) <K_FOR> <K_XML> <K_PATH> "(" token = <S_CHAR_LITERAL> ")" { plainSelect.setForXmlPath(token.image); } ]
 
     {
-      	if(plainSelect.isDeputySelect()==false) selectItems.add(0,firstItem);
         plainSelect.setSelectItems(selectItems);
         plainSelect.setFromItem(fromItem);
         if (joins != null && joins.size() > 0)
@@ -2245,11 +2229,11 @@ List<SelectItem> SelectItemsList():
     SelectItem selectItem = null;
 }
 {
-//    selectItem=SelectItem() { selectItemsList.add(selectItem); }
-    ( LOOKAHEAD(2) "," selectItem=SelectItem() { selectItemsList.add(selectItem); } )*
+    selectItem=SelectItem() { selectItemsList.add(selectItem); } ( LOOKAHEAD(2) "," selectItem=SelectItem() { selectItemsList.add(selectItem); } )*
 
     { return selectItemsList; }
 }
+
 
 List<SelectItem> chain():
 {
@@ -2270,7 +2254,7 @@ SelectExpressionItem SelectExpressionItem():
     Alias alias = null;
 }
 {
-      expression=Expression() { selectExpressionItem = new SelectExpressionItem(); selectExpressionItem.setExpression(expression); }
+      expression=ArrowExpression() { selectExpressionItem = new SelectExpressionItem(); selectExpressionItem.setExpression(expression); }
       [ LOOKAHEAD(2) alias=Alias() { selectExpressionItem.setAlias(alias); }] { return selectExpressionItem; }
 }
 
@@ -3210,9 +3194,26 @@ First First():
     )
     {
         return first;
-    }
+
+}
 }
 
+Expression ArrowExpression()#Expression:{
+    List<Expression> expressionList=new ArrayList<Expression>();
+    Expression expression;
+    boolean isArrow=false;
+}
+{
+    expression=Expression(){expressionList.add(expression);}
+    (LOOKAHEAD(3) <OP_ARROW> expression=Expression(){
+        expressionList.add(expression);
+        isArrow=true;
+    })*
+    {
+        if(isArrow) return new ArrowExpression(expressionList);
+        return expression;
+    }
+}
 
 Expression Expression() #Expression :
 {
@@ -5465,7 +5466,25 @@ CreateDeputyClass CreateDeputyClass():
 //TODO TMDB
 //书写创建轨迹join代理类的语法解析，参考创建代理类的语法解析，只需要保留table，select两个属性
 //CreateTJoinDeputyClass CreateTJoinDeputyClass()
+CreateTJoinDeputyClass CreateTJoinDeputyClass():
+{
+    CreateTJoinDeputyClass createDeputyClass = new CreateTJoinDeputyClass();
+    Table deputy = null;
+    Select select = null;
+    List<String> columnNames = null;
+    Token tk;
+}
+{
+    <K_CREATE>
 
+    [ <K_OR> <K_REPLACE> { createDeputyClass.setOrReplace(true);} ]
+    tk=<K_DEPUTYCLASS> deputy=Table() {
+//      createDeputyClass.setType(tk.image);
+      createDeputyClass.setDeputyClass(deputy); }
+    <K_AS>
+    select=SelectWithWithItems( ) { createDeputyClass.setSelect(select); }
+    { return createDeputyClass; }
+}
 
 ReferentialAction.Action Action():
 {
@@ -6178,12 +6197,12 @@ AlterExpression AlterExpression():
           tk=<S_CHAR_LITERAL> { alterExp.setCommentText(tk.image); }
       )
       |
-      tokens = captureRest() { 
+      tokens = captureRest() {
                     alterExp.setOperation(AlterOperation.UNSPECIFIC);
                     StringBuilder optionalSpecifier = new StringBuilder();
                     int i=0;
 
-                    for (String s: tokens) 
+                    for (String s: tokens)
                         if (!s.equals(";")) {
                             if (i>0)
                                 optionalSpecifier.append( " " );
@@ -6235,18 +6254,18 @@ AlterSession AlterSession():
 }
 {
     <K_ALTER> <K_SESSION> (
-        ( 
+        (
            <K_ADVISE>   ( <K_COMMIT> { operation = AlterSessionOperation.ADVISE_COMMIT; }
                         | <K_ROLLBACK> { operation = AlterSessionOperation.ADVISE_ROLLBACK; }
                         | <K_NOTHING> { operation = AlterSessionOperation.ADVISE_NOTHING; }
                         )
         )
         |
-        ( 
+        (
             <K_CLOSE> <K_DATABASE> <K_LINK> { operation = AlterSessionOperation.CLOSE_DATABASE_LINK; }
         )
-        |   
-        (   
+        |
+        (
             <K_ENABLE>  ( <K_COMMIT> <K_IN> <K_PROCEDURE> { operation = AlterSessionOperation.ENABLE_COMMIT_IN_PROCEDURE; }
                         | <K_GUARD> { operation = AlterSessionOperation.ENABLE_GUARD; }
                         | <K_PARALLEL> ( <K_DML> { operation = AlterSessionOperation.ENABLE_PARALLEL_DML; }
@@ -6257,7 +6276,7 @@ AlterSession AlterSession():
                         )
         )
         |
-        (   
+        (
             <K_DISABLE> ( <K_COMMIT> <K_IN> <K_PROCEDURE> { operation = AlterSessionOperation.DISABLE_COMMIT_IN_PROCEDURE; }
                         | <K_GUARD> { operation = AlterSessionOperation.DISABLE_GUARD; }
                         | <K_PARALLEL> ( <K_DML> { operation = AlterSessionOperation.DISABLE_PARALLEL_DML; }
@@ -6268,19 +6287,19 @@ AlterSession AlterSession():
                         )
         )
         |
-        (   
+        (
             <K_FORCE> <K_PARALLEL> ( <K_DML> { operation = AlterSessionOperation.FORCE_PARALLEL_DML; }
                                    | <K_DDL> { operation = AlterSessionOperation.FORCE_PARALLEL_DDL; }
                                    | <K_QUERY> { operation = AlterSessionOperation.FORCE_PARALLEL_QUERY; }
                                    )
         )
         |
-        (   
+        (
             <K_SET> { operation = AlterSessionOperation.SET; }
         )
     )
 
-    (   ( token = <S_CHAR_LITERAL> 
+    (   ( token = <S_CHAR_LITERAL>
             | token = <S_IDENTIFIER>
             | token = "="
             | token = <S_LONG>
@@ -6301,37 +6320,37 @@ AlterSystemStatement AlterSystemStatement():
 }
 {
     <K_ALTER> <K_SYSTEM> (
-        ( 
+        (
            "ARCHIVE" "LOG" { operation = AlterSystemOperation.ARCHIVE_LOG; }
         )
         |
-        ( 
+        (
             "CHECKPOINT" { operation = AlterSystemOperation.CHECKPOINT; }
         )
         |
-        ( 
+        (
             "DUMP" "ACTIVE" "SESSION" "HISTORY" { operation = AlterSystemOperation.DUMP_ACTIVE_SESSION_HISTORY; }
         )
-        |   
-        (   
-            <K_ENABLE>  ( 
+        |
+        (
+            <K_ENABLE>  (
                             "DISTRIBUTED RECOVERY" { operation = AlterSystemOperation.ENABLE_DISTRIBUTED_RECOVERY; }
                             | "RESTRICTED SESSION" { operation = AlterSystemOperation.ENABLE_DISTRIBUTED_RECOVERY; }
                         )
         )
         |
-        (   
-            <K_DISABLE> ( 
+        (
+            <K_DISABLE> (
                             "DISTRIBUTED RECOVERY" { operation = AlterSystemOperation.DISABLE_DISTRIBUTED_RECOVERY; }
                             | "RESTRICTED SESSION" { operation = AlterSystemOperation.DISABLE_RESTRICTED_SESSION; }
                         )
         )
         |
-        ( 
+        (
             "FLUSH" { operation = AlterSystemOperation.FLUSH; }
         )
         |
-        ( 
+        (
             "DISCONNECT" "SESSION" { operation = AlterSystemOperation.DISCONNECT_SESSION; }
         )
         |
@@ -6339,19 +6358,19 @@ AlterSystemStatement AlterSystemStatement():
             "KILL SESSION" { operation = AlterSystemOperation.KILL_SESSION; }
         )
         |
-        ( 
+        (
             "SWITCH" { operation = AlterSystemOperation.SWITCH; }
         )
         |
-        ( 
+        (
             "SUSPEND" { operation = AlterSystemOperation.SUSPEND; }
         )
         |
-        ( 
+        (
             "RESUME" { operation = AlterSystemOperation.RESUME; }
         )
         |
-        ( 
+        (
             "QUIESCE" "RESTRICTED" { operation = AlterSystemOperation.QUIESCE; }
         )
         |
@@ -6359,19 +6378,19 @@ AlterSystemStatement AlterSystemStatement():
             "UNQUIESCE" { operation = AlterSystemOperation.UNQUIESCE; }
         )
         |
-        ( 
+        (
             "SHUTDOWN" { operation = AlterSystemOperation.SHUTDOWN; }
         )
         |
-        ( 
+        (
             "REGISTER" { operation = AlterSystemOperation.REGISTER; }
         )
         |
-        ( 
+        (
             "SET" { operation = AlterSystemOperation.SET; }
         )
         |
-        ( 
+        (
             "RESET" { operation = AlterSystemOperation.RESET; }
         )
     )
@@ -6420,14 +6439,14 @@ RollbackStatement RollbackStatement():
     <K_ROLLBACK> { rollbackStatement = new RollbackStatement(); }
     [ <K_WORK> { rollbackStatement.setUsingWorkKeyword(true); } ]
     [   (
-            <K_TO> [ <K_SAVEPOINT> { rollbackStatement.setUsingSavepointKeyword(true); }]  
+            <K_TO> [ <K_SAVEPOINT> { rollbackStatement.setUsingSavepointKeyword(true); }]
                 token=<S_IDENTIFIER> { rollbackStatement.setSavepointName(token.image); }
         )
         |
         (
             <K_FORCE> token=<S_CHAR_LITERAL> { rollbackStatement.setForceDistributedTransactionIdentifier(token.image); }
         ) ]
-    
+
     {
         return rollbackStatement;
     }

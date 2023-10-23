@@ -2,9 +2,11 @@ language: java
 jdk:
   - openjdk8
   - openjdk11
-  
+
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - mvn clean install -Dpmd.skip=true -Dcheckstyle.skip=true -Dmaven.test.skip=true
+  - mvn cobertura:cobertura coveralls:report
+
 
 cache:
   directories:

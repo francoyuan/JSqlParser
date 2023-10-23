@@ -88,6 +88,11 @@ public class StatementValidator extends AbstractValidator<Statement> implements 
         getValidator(CreateDeputyClassValidator.class).validate(createDeputyClass);
     }
 
+    @Override
+    public void visit(CreateTJoinDeputyClass createTJoinDeputyClass) {
+
+    }
+
     //TMDB TODO
     //在StatementValidator中加入针对CreateTJoinDeputyClassValidator类的访问
 

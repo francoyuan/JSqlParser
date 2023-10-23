@@ -117,6 +117,11 @@ public class ExpressionValidator extends AbstractValidator<Expression> implement
     }
 
     @Override
+    public void visit(ArrowExpression aThis) {
+
+    }
+
+    @Override
     public void visit(BitwiseRightShift expr) {
         visitBinaryExpression(expr, " >> ");
     }

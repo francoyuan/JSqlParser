@@ -484,7 +484,7 @@ public enum Feature {
 
     //TODO TMDB
     //在feature这个枚举类中加入CreateTJoinDeputyClass
-
+    createTJoinDeputy,
 
     createViewForce,
     /**

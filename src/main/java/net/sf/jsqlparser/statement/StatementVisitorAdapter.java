@@ -113,6 +113,10 @@ public class StatementVisitorAdapter implements StatementVisitor {
 
     //TODO TMDB
     //override visit方法
+    @Override
+    public void visit(CreateTJoinDeputyClass createTJoinDeputyClass) {
+
+    }
 
     @Override
     public void visit(Alter alter) {

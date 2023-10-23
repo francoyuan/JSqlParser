@@ -148,6 +148,11 @@ public class ExpressionDeParser extends AbstractDeParser<Expression>
     }
 
     @Override
+    public void visit(ArrowExpression aThis) {
+
+    }
+
+    @Override
     public void visit(BitwiseRightShift expr) {
         visitBinaryExpression(expr, " >> ");
     }
