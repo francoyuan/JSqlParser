@@ -350,6 +350,11 @@ public class TablesNamesFinder implements SelectVisitor, FromItemVisitor, Expres
     }
 
     @Override
+    public void visit(ArrowExpression aThis) {
+
+    }
+
+    @Override
     public void visit(BitwiseRightShift expr) {
         visitBinaryExpression(expr);
     }
@@ -700,6 +705,7 @@ public class TablesNamesFinder implements SelectVisitor, FromItemVisitor, Expres
         }
     }
 
+    @Override
     public void visit(Analyze analyze) {
         visit(analyze.getTable());
     }
@@ -743,7 +749,10 @@ public class TablesNamesFinder implements SelectVisitor, FromItemVisitor, Expres
 
     //TODO TMDB
     //加入针对CreateTJoinDeputyClass的访问
-
+    @Override
+    public void visit(CreateTJoinDeputyClass createTJoinDeputyClass) {
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
+    }
 
     @Override
     public void visit(Alter alter) {
@@ -1026,7 +1035,8 @@ public class TablesNamesFinder implements SelectVisitor, FromItemVisitor, Expres
     public void visit(ConnectByRootOperator connectByRootOperator) {
         connectByRootOperator.getColumn().accept(this);
     }
-  
+
+    @Override
     public void visit(IfElseStatement ifElseStatement) {
         ifElseStatement.getIfStatement().accept(this);
         if (ifElseStatement.getElseStatement()!=null) {

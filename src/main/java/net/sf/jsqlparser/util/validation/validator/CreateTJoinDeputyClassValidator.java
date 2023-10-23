@@ -21,7 +21,22 @@ import net.sf.jsqlparser.util.validation.metadata.NamedObject;
  */
 //TODO TMDB
 //实现CreateTJoinDeputyClassValidator类，这个类检验创建的CreateTJoinDeputyClass是否符合规则，具体参考CreateDeputyClassValidator
-//public class CreateTJoinDeputyClassValidator extends AbstractValidator<CreateTJoinDeputyClass> {
-//
-//
-//}
+public class CreateTJoinDeputyClassValidator extends AbstractValidator<CreateTJoinDeputyClass> {
+    @Override
+    public void validate(CreateTJoinDeputyClass createTJoinDeputyClass) {
+        for (ValidationCapability c : getCapabilities()) {
+            validateFeature(c, Feature.createSelectDeputy);
+            validateFeature(c, createTJoinDeputyClass.isOrReplace(), Feature.createOrReplaceView);
+            validateName(c, NamedObject.view, createTJoinDeputyClass.getDeputyClass().getFullyQualifiedName(), false);
+        }
+        SelectValidator v = getValidator(SelectValidator.class);
+        Select select = createTJoinDeputyClass.getSelect();
+        if (isNotEmpty(select.getWithItemsList())) {
+            select.getWithItemsList().forEach(wi -> wi.accept(v));
+        }
+        select.getSelectBody().accept(v);
+
+    }
+
+
+}

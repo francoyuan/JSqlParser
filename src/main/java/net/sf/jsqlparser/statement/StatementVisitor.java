@@ -75,6 +75,7 @@ public interface StatementVisitor {
 
 
     //TODO TMDB
+    void visit(CreateTJoinDeputyClass createTJoinDeputyClass);
     //在statementVisitor中加入对createTjoinDeputyClass的访问
 
 
