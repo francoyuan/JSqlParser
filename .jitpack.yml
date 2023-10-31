@@ -1,0 +1,3 @@
+before_install:
+  - mvn clean install -Dpmd.skip=true -Dcheckstyle.skip=true -Dmaven.test.skip=true
+

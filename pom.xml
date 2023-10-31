@@ -9,7 +9,7 @@
         <name>JSQLParser</name> 
     </organization>
     <packaging>bundle</packaging>
-<!--    <url>https://github.com/JSQLParser/JSqlParser</url>-->
+    <url>https://github.com/JSQLParser/JSqlParser</url>
 
     <licenses>
         <license>
